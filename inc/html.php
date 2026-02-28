@@ -1223,12 +1223,13 @@ function manageBanForm() {
 		$post_ids = htmlentities($_GET['posts'], ENT_QUOTES);
 		$banmessage_html = '<tr><td><label for="message">' . __('Message') . '</label></td><td><input type="text" name="message" id="message"></td><td><small>' . __("Append a message to the post. Optional.") . '</small></td></tr>';
 	}
+	$ip = htmlentities($_GET['bans'], ENT_QUOTES);
 	return <<<EOF
 	<form id="tinyib" name="tinyib" method="post" action="?manage&bans&posts=$post_ids">
 	<fieldset>
 	<legend>$txt_ban</legend>
 	<table border="0">
-	<tr><td><label for="ip">$txt_ban_ip</label></td><td><input type="text" name="ip" id="ip" value="{$_GET['bans']}"></td><td><input type="submit" value="$txt_submit" class="managebutton"></td></tr>
+	<tr><td><label for="ip">$txt_ban_ip</label></td><td><input type="text" name="ip" id="ip" value="$ip"></td><td><input type="submit" value="$txt_submit" class="managebutton"></td></tr>
 	<tr><td><label for="expire">$txt_ban_expire</label></td><td><input type="text" name="expire" id="expire" value="0"></td><td><small><a href="#" onclick="document.tinyib.expire.value='3600';return false;">$txt_1h</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='86400';return false;">$txt_1d</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='172800';return false;">$txt_2d</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='604800';return false;">$txt_1w</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='1209600';return false;">$txt_2w</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='2592000';return false;">$txt_1m</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='0';return false;">$txt_ban_never</a></small></td></tr>
 	<tr><td><label for="reason">$txt_ban_reason</label></td><td><input type="text" name="reason" id="reason"></td><td><small>$txt_ban_optional</small></td></tr>
 	$banmessage_html
