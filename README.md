@@ -10,8 +10,9 @@ All desired features have been implemented in TinyIB. Only security fixes, bug
 fixes and translation updates will continue to be added.
 
 [Sriracha](https://codeberg.org/tslocum/sriracha) is a modern imageboard system
-with support for importing TinyIB boards. While TinyIB will continue to function,
-site owners are recommended to migrate to Sriracha if and when possible.
+with support for [importing TinyIB posts](https://codeberg.org/tslocum/sriracha/src/branch/main/MANUAL.md#import-posts-from-tinyib)
+and many additional features. While TinyIB will continue to function, site
+administrators are recommended to migrate to Sriracha if and when possible.
 
 ## Features
 
