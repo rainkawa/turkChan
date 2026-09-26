@@ -52,7 +52,7 @@ class SimpleCaptcha {
 	public $maxWordLength = 6;
 
 	/** Sessionname to store the original text */
-	public $session_var = 'tinyibcaptcha';
+	public $session_var = 'turkchancaptcha';
 
 	/** Background color in RGB-array */
 	public $backgroundColor = array(254, 254, 254);

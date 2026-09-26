@@ -369,7 +369,7 @@ function checkCAPTCHA($mode) {
 		}
 	} else if ($mode) { // Simple CAPTCHA
 		$captcha = isset($_POST['captcha']) ? strtolower(trim($_POST['captcha'])) : '';
-		$captcha_solution = isset($_SESSION['tinyibcaptcha']) ? strtolower(trim($_SESSION['tinyibcaptcha'])) : '';
+		$captcha_solution = isset($_SESSION['turkchancaptcha']) ? strtolower(trim($_SESSION['turkchancaptcha'])) : '';
 
 		if ($captcha == '') {
 			fancyDie(__('Please enter the CAPTCHA text.'));
@@ -447,12 +447,12 @@ function manageCheckLogIn($requireKey) {
 	$isadmin = false;
 
 	$key = (isset($_GET['manage']) && $_GET['manage'] != '') ? hashData($_GET['manage']) : '';
-	if ($key == '' && isset($_SESSION['tinyib_key'])) {
-		$key = $_SESSION['tinyib_key'];
+	if ($key == '' && isset($_SESSION['turkchan_key'])) {
+		$key = $_SESSION['turkchan_key'];
 	}
 	if (TINYIB_MANAGEKEY != '' && $key !== hashData(TINYIB_MANAGEKEY)) {
-		$_SESSION['tinyib_key'] = '';
-		$_SESSION['tinyib_account'] = '';
+		$_SESSION['turkchan_key'] = '';
+		$_SESSION['turkchan_account'] = '';
 		session_destroy();
 
 		if ($requireKey) {
@@ -469,18 +469,18 @@ function manageCheckLogIn($requireKey) {
 		if (empty($a) || hashData($_POST['managepassword'], true) !== $a['password']) {
 			fancyDie(__('Invalid username or password.'));
 		}
-		$_SESSION['tinyib_key'] = hashData(TINYIB_MANAGEKEY);
-		$_SESSION['tinyib_username'] = $a['username'];
-		$_SESSION['tinyib_password'] = $a['password'];
+		$_SESSION['turkchan_key'] = hashData(TINYIB_MANAGEKEY);
+		$_SESSION['turkchan_username'] = $a['username'];
+		$_SESSION['turkchan_password'] = $a['password'];
 
 		// Prevent reauthentication
 		$_POST['username'] = '';
 		$_POST['managepassword'] = '';
 	}
 
-	if (isset($_SESSION['tinyib_username']) && isset($_SESSION['tinyib_password'])) {
-		$a = accountByUsername($_SESSION['tinyib_username']);
-		if (!empty($a) && $a['password'] == $_SESSION['tinyib_password'] && $a['role'] != TINYIB_DISABLED) {
+	if (isset($_SESSION['turkchan_username']) && isset($_SESSION['turkchan_password'])) {
+		$a = accountByUsername($_SESSION['turkchan_username']);
+		if (!empty($a) && $a['password'] == $_SESSION['turkchan_password'] && $a['role'] != TINYIB_DISABLED) {
 			$account = $a;
 			$loggedin = true;
 			if ($account['role'] == TINYIB_SUPER_ADMINISTRATOR || $account['role'] == TINYIB_ADMINISTRATOR) {

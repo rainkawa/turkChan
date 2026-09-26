@@ -1,3 +1,8 @@
+/*
+ * TurkChan
+ * https://github.com/rainkawa/turkChan
+ */
+
 var newRepliesCount = 0;
 var newRepliesNotice = [];
 var originalTitle = "";
@@ -20,7 +25,7 @@ function getCookie(cname) {
 }
 
 function setStylesheet(style) {
-    document.cookie = 'tinyib_style=' + style + '; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/; SameSite=Strict';
+    document.cookie = 'turkchan_style=' + style + '; expires=Tue, 19 Jan 2038 03:14:07 UTC; path=/; SameSite=Strict';
 
     if ($("#mainStylesheet").attr('href').substring(0, 3) == '../') {
         $("#mainStylesheet").attr('href', '../css/' + style + '.css');
@@ -135,7 +140,7 @@ function autoRefresh() {
 }
 
 window.addEventListener('DOMContentLoaded', function (e) {
-    var style = getCookie("tinyib_style");
+    var style = getCookie("turkchan_style");
     if (style && style != "") {
         setStylesheet(style);
     }
@@ -156,12 +161,12 @@ window.addEventListener('DOMContentLoaded', function (e) {
             if (newpostpassword) {
                 var expiration_date = new Date();
                 expiration_date.setFullYear(expiration_date.getFullYear() + 7);
-                document.cookie = "tinyib_password=" + encodeURIComponent(newpostpassword.val()) + "; path=/; expires=" + expiration_date.toGMTString();
+                document.cookie = "turkchan_password=" + encodeURIComponent(newpostpassword.val()) + "; path=/; expires=" + expiration_date.toGMTString();
             }
         });
     }
 
-    var password = getCookie("tinyib_password");
+    var password = getCookie("turkchan_password");
     if (password && password != "") {
         if (newpostpassword) {
             newpostpassword.val(password);

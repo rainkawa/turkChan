@@ -1,12 +1,12 @@
 <?php
-if (!defined('TINYIB_BOARD')) {
+if (!defined('TINYIB_BOARD') || !defined('TURKCHAN_CONFIG')) {
 	die('');
 }
 
 define('TINYIB_NEWTHREAD', '0');
 define('TINYIB_INDEXPAGE', false);
 define('TINYIB_RESPAGE', true);
-define('TINYIB_LOCKFILE', 'tinyib.lock');
+define('TINYIB_LOCKFILE', TURKCHAN_LOCKFILE);
 define('TINYIB_WORDBREAK_IDENTIFIER', '@!@TINYIB_WORDBREAK@!@');
 
 // Account roles
@@ -27,7 +27,7 @@ if (!defined('TINYIB_MANAGEKEY')) {
 	define('TINYIB_MANAGEKEY', '');
 }
 if (!defined('TINYIB_INDEX')) {
-	define('TINYIB_INDEX', 'index.html');
+	define('TINYIB_INDEX', TURKCHAN_BOARD_INDEX);
 }
 if (!defined('TINYIB_MAXREPLIES')) {
 	define('TINYIB_MAXREPLIES', 0);
@@ -156,10 +156,10 @@ if (!defined('TINYIB_DBDSN')) {
 	define('TINYIB_DBDSN', '');
 }
 if (!defined('TINYIB_DBPATH')) {
-	if (file_exists('tinyib.db')) {
-		define('TINYIB_DBPATH', 'tinyib.db');
+	if (file_exists(TURKCHAN_SLUG . '.db')) {
+		define('TINYIB_DBPATH', TURKCHAN_SLUG . '.db');
 	} else {
-		define('TINYIB_DBPATH', '.tinyib.db');
+		define('TINYIB_DBPATH', '.' . TURKCHAN_SLUG . '.db');
 	}
 }
 if (!defined('TINYIB_DEFAULTSTYLE')) {

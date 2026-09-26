@@ -1,7 +1,7 @@
 <?php
 /*
-TinyIB
-https://codeberg.org/tslocum/tinyib
+TurkChan
+https://github.com/rainkawa/turkChan
 
 MIT License
 
@@ -47,6 +47,7 @@ if (!file_exists('settings.php')) {
 	fancyDie('Please copy the file settings.default.php to settings.php');
 }
 require 'settings.php';
+require 'inc/config.php';
 require 'inc/defines.php';
 global $tinyib_capcodes, $tinyib_embeds, $tinyib_hidefields, $tinyib_hidefieldsop;
 
@@ -664,8 +665,9 @@ if (!isset($_GET['delete']) && !isset($_GET['manage']) && (isset($_POST['name'])
 
 			$txt_report = __('Please complete a CAPTCHA to submit your report');
 			$txt_submit = __('Submit');
+			$form_name = TURKCHAN_FORM_NAME;
 			$body = <<<EOF
-<form id="tinyib" name="tinyib" method="post" action="?report={$post['id']}&verify">
+<form id="{$form_name}" name="{$form_name}" method="post" action="?report={$post['id']}&verify">
 <fieldset>
 <legend align="center">$txt_report</legend>
 <div class="login">
@@ -741,8 +743,8 @@ EOF;
 	$returnlink = basename($_SERVER['PHP_SELF']);
 
 	if (isset($_GET["logout"])) {
-		$_SESSION['tinyib'] = '';
-		$_SESSION['tinyib_key'] = '';
+		$_SESSION['turkchan'] = '';
+		$_SESSION['turkchan_key'] = '';
 		session_destroy();
 		die('--&gt; --&gt; --&gt;<meta http-equiv="refresh" content="0;url=imgboard.php">');
 	}
@@ -971,12 +973,12 @@ EOF;
 					$text .= '<blockquote class="reply" style="padding: 7px;font-size: 1.25em;">
 					<pre style="margin: 0;padding: 0;">Attempting update...' . "\n\n" . $git_output . '</pre>
 					</blockquote>
-					<p><b>Note:</b> If TinyIB updates and you have made custom modifications, <a href="https://codeberg.org/tslocum/tinyib/commits/master" target="_blank">review the changes</a> which have been merged into your installation.
+					<p><b>Note:</b> If ' . TURKCHAN_NAME . ' updates and you have made custom modifications, <a href="' . TURKCHAN_COMMITS_URL . '" target="_blank">review the changes</a> which have been merged into your installation.
 					Ensure that your modifications do not interfere with any new/modified files.
-					See the <a href="https://codeberg.org/tslocum/tinyib/src/branch/master/README.md">README</a> <small>(<a href="README.md" target="_blank">alternate link</a>)</small> for instructions.</p>';
+					See the <a href="' . TURKCHAN_README_URL . '">README</a> <small>(<a href="README.md" target="_blank">alternate link</a>)</small> for instructions.</p>';
 				} else {
-					$text .= '<p><b>TinyIB was not installed via Git.</b></p>
-					<p>If you installed TinyIB without Git, you must <a href="https://codeberg.org/tslocum/tinyib">update manually</a>.  If you did install with Git, ensure the script has read and write access to the <b>.git</b> folder.</p>';
+					$text .= '<p><b>' . TURKCHAN_NAME . ' was not installed via Git.</b></p>
+					<p>If you installed ' . TURKCHAN_NAME . ' without Git, you must <a href="' . TURKCHAN_REPO_URL . '">update manually</a>.  If you did install with Git, ensure the script has read and write access to the <b>.git</b> folder.</p>';
 				}
 			} elseif (isset($_GET['dbmigrate'])) {
 				if (TINYIB_DBMIGRATE !== '' && TINYIB_DBMIGRATE !== false && TINYIB_DBMODE != TINYIB_DBMIGRATE) {
@@ -1038,7 +1040,7 @@ EOF;
 
 						echo '<p><b>Database migration complete</b>.  Set TINYIB_DBMODE to the new database mode and TINYIB_DBMIGRATE to false, then click <b>Rebuild All</b> above and ensure everything looks and works as it should.</p>';
 					} else {
-						$text .= '<p>Your original database will not be deleted.  If the migration fails, disable the tool and your board will be unaffected.  See the <a href="https://codeberg.org/tslocum/tinyib/src/branch/master/README.md" target="_blank">README</a> <small>(<a href="README.md" target="_blank">alternate link</a>)</small> for instructions.</a><br><br><a href="?manage&dbmigrate&go"><b>Start the migration</b></a></p>';
+						$text .= '<p>Your original database will not be deleted.  If the migration fails, disable the tool and your board will be unaffected.  See the <a href="' . TURKCHAN_README_URL . '" target="_blank">README</a> <small>(<a href="README.md" target="_blank">alternate link</a>)</small> for instructions.</a><br><br><a href="?manage&dbmigrate&go"><b>Start the migration</b></a></p>';
 					}
 				} else {
 					fancyDie('Set TINYIB_DBMIGRATE to the desired TINYIB_DBMODE and enter in any database related settings in settings.php before migrating.');

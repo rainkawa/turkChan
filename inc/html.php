@@ -1,5 +1,5 @@
 <?php
-if (!defined('TINYIB_BOARD')) {
+if (!defined('TINYIB_BOARD') || !defined('TURKCHAN_CONFIG')) {
 	die('');
 }
 
@@ -9,7 +9,7 @@ function pageHeader() {
 	} else if (TINYIB_BOARDDESC != '') {
 		$title = TINYIB_BOARDDESC;
 	} else {
-		$title = 'TinyIB';
+		$title = TURKCHAN_NAME;
 	}
 
 	$js_captcha = '';
@@ -21,6 +21,8 @@ function pageHeader() {
 	}
 
 	$stylesheets = pageStylesheets();
+	$favicon = TURKCHAN_FAVICON;
+	$js = TURKCHAN_JS;
 
 	return <<<EOF
 <!DOCTYPE html>
@@ -34,10 +36,10 @@ function pageHeader() {
 		<meta http-equiv="pragma" content="no-cache">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>$title</title>
-		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="shortcut icon" href="$favicon">
 		$stylesheets
 		<script src="js/jquery.js"></script>
-		<script src="js/tinyib.js"></script>
+		<script src="$js"></script>
 		$js_captcha
 	</head>
 EOF;
@@ -65,16 +67,45 @@ function pageStylesheets() {
 }
 
 function pageFooter() {
-	// If the footer link is removed from the page, please link to TinyIB somewhere on the site.
-	// This is all I ask in return for the free software you are using.
+	// TurkChan footer. If the footer link is removed from the page, please link to
+	// TurkChan somewhere on the site. This is all we ask in return for the free
+	// software you are using.
+
+	$footer = TURKCHAN_FOOTER_HTML != '' ? TURKCHAN_FOOTER_HTML : TURKCHAN_FOOTER_DEFAULT;
 
 	return <<<EOF
 		<div class="footer">
-			- <a href="http://www.2chan.net" target="_blank">futaba</a> + <a href="http://www.1chan.net" target="_blank">futallaby</a> + <a href="https://codeberg.org/tslocum/tinyib" target="_blank">tinyib</a> -
+			$footer
 		</div>
 	</body>
 </html>
 EOF;
+}
+
+// TurkChan logo sistemi.
+// Oncelik sirasi: TINYIB_LOGO > TURKCHAN_LOGO_HTML > TURKCHAN_LOGO_IMAGE
+//                 > TINYIB_BOARDDESC > TURKCHAN_LOGO_TEXT
+// Logo altina istege bagli olarak TURKCHAN_LOGO_SUBTITLE eklenir.
+function pageLogo() {
+	$logo = TINYIB_LOGO;
+	$desc = TINYIB_BOARDDESC;
+
+	if ($logo == '' && TURKCHAN_LOGO_HTML != '') {
+		$logo = TURKCHAN_LOGO_HTML;
+	}
+	if ($logo == '' && TURKCHAN_LOGO_IMAGE != '') {
+		$logo = '<img src="' . htmlentities(TURKCHAN_LOGO_IMAGE, ENT_QUOTES) . '" alt="' . htmlentities(TURKCHAN_LOGO_TEXT, ENT_QUOTES) . '">';
+	}
+	if ($logo == '' && $desc == '') {
+		$logo = TURKCHAN_LOGO_TEXT;
+	}
+
+	$out = $logo . $desc;
+	if ($out != '' && TURKCHAN_LOGO_SUBTITLE != '') {
+		$out .= '<br><small>' . TURKCHAN_LOGO_SUBTITLE . '</small>';
+	}
+
+	return $out;
 }
 
 function supportedFileTypes() {
@@ -631,7 +662,7 @@ EOF;
 function buildPage($htmlposts, $parent, $pages = 0, $thispage = 0, $lastpostid = 0) {
 	global $tinyib_stylesheets;
 
-	$cataloglink = TINYIB_CATALOG ? ('[<a href="catalog.html" style="text-decoration: underline;">' . __('Catalog') . '</a>]') : '';
+	$cataloglink = TINYIB_CATALOG ? ('[<a href="' . TURKCHAN_BOARD_CATALOG . '" style="text-decoration: underline;">' . __('Catalog') . '</a>]') : '';
 	$managelink = (TINYIB_MANAGEKEY == '') ? ('[<a href="' . basename($_SERVER['PHP_SELF']) . '?manage"" style="text-decoration: underline;">' . __('Manage') . '</a>]') : '';
 
 	$postingmode = "";
@@ -667,18 +698,19 @@ function buildPage($htmlposts, $parent, $pages = 0, $thispage = 0, $lastpostid =
 EOF;
 		if (TINYIB_CATALOG) {
 			$txt_catalog = __('Catalog');
+			$catalog_file = TURKCHAN_BOARD_CATALOG;
 			$pagenavigator .= <<<EOF
 <table border="1" style="display: inline-block;margin-left: 21px;">
 	<tbody>
 		<tr>
-			<td><form method="get" action="catalog.html"><input value="$txt_catalog" type="submit"></form></td>
+			<td><form method="get" action="$catalog_file"><input value="$txt_catalog" type="submit"></form></td>
 		</tr>
 	</tbody>
 </table>
 EOF;
 		}
 	} else if ($parent == -1) {
-		$postingmode = '&#91;<a href="index.html">' . __('Return') . '</a>&#93;<div class="replymode">' . __('Catalog') . '</div> ';
+		$postingmode = '&#91;<a href="' . TINYIB_INDEX . '">' . __('Return') . '</a>&#93;<div class="replymode">' . __('Catalog') . '</div> ';
 	} else {
 		$postingmode = '&#91;<a href="../">' . __('Return') . '</a>&#93;<div class="replymode">' . __('Posting mode: Reply') . '</div> ';
 	}
@@ -723,7 +755,7 @@ EOF;
 		</div>
 		<div class="logo">
 EOF;
-	$body .= TINYIB_LOGO . TINYIB_BOARDDESC . <<<EOF
+	$body .= pageLogo() . <<<EOF
 		</div>
 		<hr width="90%">
 		$postingmode
@@ -782,7 +814,7 @@ function rebuildCatalog() {
 		$htmlposts .= buildCatalogPost($post);
 	}
 
-	writePage('catalog.html', buildPage($htmlposts, -1));
+	writePage(TURKCHAN_BOARD_CATALOG, buildPage($htmlposts, -1));
 }
 
 function rebuildIndexes() {
@@ -827,8 +859,8 @@ function rebuildIndexes() {
 	}
 
 	if (TINYIB_JSON) {
-		writePage('threads.json', buildIndexJSON());
-		writePage('catalog.json', buildCatalogJSON());
+		writePage(TURKCHAN_BOARD_THREADS_JSON, buildIndexJSON());
+		writePage(TURKCHAN_BOARD_CATALOG_JSON, buildCatalogJSON());
 	}
 }
 
@@ -909,7 +941,7 @@ function managePage($text, $onload = '') {
 		</div>
 		<div class="logo">
 EOF;
-	$body .= TINYIB_LOGO . TINYIB_BOARDDESC . <<<EOF
+	$body .= pageLogo() . <<<EOF
 		</div>
 		<hr width="90%">
 		<div class="replymode">$txt_manage_mode</div>
@@ -920,18 +952,19 @@ EOF;
 }
 
 function manageOnLoad($page) {
+	$form = TURKCHAN_FORM_NAME;
 	switch ($page) {
 		case 'accounts':
 		case 'login':
-			return ' onload="document.tinyib.username.focus();"';
+			return ' onload="document.' . $form . '.username.focus();"';
 		case 'bans':
-			return ' onload="document.tinyib.ip.focus();"';
+			return ' onload="document.' . $form . '.ip.focus();"';
 		case 'keywords':
-			return ' onload="document.tinyib.text.focus();"';
+			return ' onload="document.' . $form . '.text.focus();"';
 		case 'moderate':
-			return ' onload="document.tinyib.moderate.focus();"';
+			return ' onload="document.' . $form . '.moderate.focus();"';
 		case 'staffpost':
-			return ' onload="document.tinyib.message.focus();"';
+			return ' onload="document.' . $form . '.message.focus();"';
 	}
 }
 
@@ -970,8 +1003,9 @@ function manageLogInForm() {
 <img id="captchaimage" src="inc/captcha.php" width="175" height="55" alt="CAPTCHA" onclick="javascript:reloadCAPTCHA()" style="margin-top: 5px;cursor: pointer;"><br><br>';
 	}
 	$managekey = htmlentities($_GET['manage'], ENT_QUOTES);
+	$form_name = TURKCHAN_FORM_NAME;
 	return <<<EOF
-	<form id="tinyib" name="tinyib" method="post" action="?manage=$managekey">
+	<form id="{$form_name}" name="{$form_name}" method="post" action="?manage=$managekey">
 	<fieldset>
 	<legend align="center">$txt_login_prompt</legend>
 	<div class="login">
@@ -1111,8 +1145,9 @@ EOF;
 function manageChangePasswordForm() {
 	$txt_header = __('Change Password');
 	$txt_submit = __('Submit');
+	$form_name = TURKCHAN_FORM_NAME;
 	return <<<EOF
-	<form id="tinyib" name="tinyib" method="post" action="?manage&changepassword">
+	<form id="{$form_name}" name="{$form_name}" method="post" action="?manage&changepassword">
 	<fieldset>
 	<legend>$txt_header</legend>
 	<table border="0">
@@ -1147,8 +1182,9 @@ function manageAccountForm($id = 0) {
 	$txt_username = __('Username');
 	$txt_password = __('Password');
 	$txt_role = __('Role');
+	$form_name = TURKCHAN_FORM_NAME;
 	$return = <<<EOF
-	<form id="tinyib" name="tinyib" method="post" action="?manage&accounts">
+	<form id="{$form_name}" name="{$form_name}" method="post" action="?manage&accounts">
 	<input type="hidden" name="id" value="{$a['id']}">
 	<fieldset>
 	<legend>$txt_header</legend>
@@ -1224,13 +1260,14 @@ function manageBanForm() {
 		$banmessage_html = '<tr><td><label for="message">' . __('Message') . '</label></td><td><input type="text" name="message" id="message"></td><td><small>' . __("Append a message to the post. Optional.") . '</small></td></tr>';
 	}
 	$ip = htmlentities($_GET['bans'], ENT_QUOTES);
+	$form_name = TURKCHAN_FORM_NAME;
 	return <<<EOF
-	<form id="tinyib" name="tinyib" method="post" action="?manage&bans&posts=$post_ids">
+	<form id="{$form_name}" name="{$form_name}" method="post" action="?manage&bans&posts=$post_ids">
 	<fieldset>
 	<legend>$txt_ban</legend>
 	<table border="0">
 	<tr><td><label for="ip">$txt_ban_ip</label></td><td><input type="text" name="ip" id="ip" value="$ip"></td><td><input type="submit" value="$txt_submit" class="managebutton"></td></tr>
-	<tr><td><label for="expire">$txt_ban_expire</label></td><td><input type="text" name="expire" id="expire" value="0"></td><td><small><a href="#" onclick="document.tinyib.expire.value='3600';return false;">$txt_1h</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='86400';return false;">$txt_1d</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='172800';return false;">$txt_2d</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='604800';return false;">$txt_1w</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='1209600';return false;">$txt_2w</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='2592000';return false;">$txt_1m</a>&nbsp;<a href="#" onclick="document.tinyib.expire.value='0';return false;">$txt_ban_never</a></small></td></tr>
+	<tr><td><label for="expire">$txt_ban_expire</label></td><td><input type="text" name="expire" id="expire" value="0"></td><td><small><a href="#" onclick="document.{$form_name}.expire.value='3600';return false;">$txt_1h</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='86400';return false;">$txt_1d</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='172800';return false;">$txt_2d</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='604800';return false;">$txt_1w</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='1209600';return false;">$txt_2w</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='2592000';return false;">$txt_1m</a>&nbsp;<a href="#" onclick="document.{$form_name}.expire.value='0';return false;">$txt_ban_never</a></small></td></tr>
 	<tr><td><label for="reason">$txt_ban_reason</label></td><td><input type="text" name="reason" id="reason"></td><td><small>$txt_ban_optional</small></td></tr>
 	$banmessage_html
 	</table><br>
@@ -1263,8 +1300,9 @@ function manageModeratePostForm() {
 	$txt_tip = __('Tip');
 	$txt_tiptext1 = __('While browsing the image board, you can easily moderate a post if you are logged in.');
 	$txt_tiptext2 = __('Tick the box next to a post and click "Delete" at the bottom of the page with a blank password.');
+	$form_name = TURKCHAN_FORM_NAME;
 	return <<<EOF
-	<form id="tinyib" name="tinyib" method="get" action="?">
+	<form id="{$form_name}" name="{$form_name}" method="get" action="?">
 	<input type="hidden" name="manage" value="">
 	<fieldset>
 	<legend>$txt_moderate</legend>
@@ -1512,8 +1550,9 @@ function manageEditKeyword($id) {
 	$txt_action = __('Action');
 	$txt_submit = $id > 0 ? __('Update') : __('Add');
 
+	$form_name = TURKCHAN_FORM_NAME;
 	$return = <<<EOF
-	<form id="tinyib" name="tinyib" method="post" action="?manage&keywords=$id">
+	<form id="{$form_name}" name="{$form_name}" method="post" action="?manage&keywords=$id">
 	<fieldset>
 	<legend>$txt_keywords</legend>
 	<table border="0">
@@ -1598,6 +1637,7 @@ function manageStatus() {
 		$info .= ', ' . count($reports) . ' ' . plural(count($reports), __('report'), __('reports'));
 	}
 	$info .= ', ' . $bans . ' ' . plural($bans, __('ban'), __('bans'));
+	$info .= '<br>' . TURKCHAN_NAME . ' v' . TURKCHAN_VERSION;
 
 	$output = '';
 	if ($isadmin && TINYIB_DBMODE == 'mysql' && function_exists('mysqli_connect')) { // Recommend MySQLi
