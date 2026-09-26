@@ -1,4 +1,22 @@
 <?php
+/*
+TurkChan - Sunum (presentation) katmani
+https://github.com/rainkawa/turkChan
+
+Bu dosya yalnizca HTML uretir: sayfa iskeleti, post gorunumu, katalog
+gorsunumu, gonderi formu ve yonetim paneli formlari.
+
+Kural: is mantigi burada degildir.
+  - Post kaydi islemleri      -> inc/posts/
+  - Thread / index uretimi   -> inc/threads/
+  - Veri erisimi             -> inc/database/
+  - Yonetim eylemleri        -> inc/moderation/, inc/users/, inc/threads/
+
+rebuildCatalog/rebuildIndexes/rebuildThread fonksiyonlari 1200
+kapsaminda bu dosyadan inc/threads/threads.php icine tasindi; boylece
+"veri + dosya uretimi" ile "HTML uretimi" birbirinden ayrildi.
+*/
+
 if (!defined('TINYIB_BOARD') || !defined('TURKCHAN_CONFIG')) {
 	die('');
 }
@@ -805,92 +823,6 @@ EOF;
 	$subject
 </div>
 EOF;
-}
-
-function rebuildCatalog() {
-	$threads = allThreads();
-	$htmlposts = '';
-	foreach ($threads as $post) {
-		$htmlposts .= buildCatalogPost($post);
-	}
-
-	writePage(TURKCHAN_BOARD_CATALOG, buildPage($htmlposts, -1));
-}
-
-function rebuildIndexes() {
-	$page = 0;
-	$i = 0;
-	$htmlposts = '';
-	$threads = allThreads();
-	$pages = ceil(count($threads) / TINYIB_THREADSPERPAGE) - 1;
-
-	foreach ($threads as $thread) {
-		$replies = postsInThreadByID($thread['id']);
-		$thread['omitted'] = max(0, count($replies) - TINYIB_PREVIEWREPLIES - 1);
-
-		// Build replies for preview
-		$htmlreplies = array();
-		for ($j = count($replies) - 1; $j > $thread['omitted']; $j--) {
-			$htmlreplies[] = buildPost($replies[$j], TINYIB_INDEXPAGE);
-		}
-
-		if ($i > 0) {
-			$htmlposts .= "\n<hr>";
-		}
-		$htmlposts .= buildPost($thread, TINYIB_INDEXPAGE) . implode('', array_reverse($htmlreplies));
-
-		if (++$i >= TINYIB_THREADSPERPAGE) {
-			$file = ($page == 0) ? TINYIB_INDEX : ($page . '.html');
-			writePage($file, buildPage($htmlposts, 0, $pages, $page));
-
-			$page++;
-			$i = 0;
-			$htmlposts = '';
-		}
-	}
-
-	if ($page == 0 || $htmlposts != '') {
-		$file = ($page == 0) ? TINYIB_INDEX : ($page . '.html');
-		writePage($file, buildPage($htmlposts, 0, $pages, $page));
-	}
-
-	if (TINYIB_CATALOG) {
-		rebuildCatalog();
-	}
-
-	if (TINYIB_JSON) {
-		writePage(TURKCHAN_BOARD_THREADS_JSON, buildIndexJSON());
-		writePage(TURKCHAN_BOARD_CATALOG_JSON, buildCatalogJSON());
-	}
-}
-
-function rebuildThread($id) {
-	$id = intval($id);
-
-	$post = postByID($id);
-	if (empty($post) || $post['moderated'] == 0) {
-		@unlink('res/' . $id . '.html');
-		return;
-	}
-
-	$posts = postsInThreadByID($id);
-	if (count($posts) == 0) {
-		@unlink('res/' . $id . '.html');
-		return;
-	}
-
-	$htmlposts = "";
-	$lastpostid = 0;
-	foreach ($posts as $post) {
-		$htmlposts .= buildPost($post, TINYIB_RESPAGE);
-		$lastpostid = $post['id'];
-	}
-
-	writePage('res/' . $id . '.html', fixLinksInRes(buildPage($htmlposts, $id, 0, 0, $lastpostid)));
-
-	if (TINYIB_JSON) {
-		writePage('res/' . $id . '.json', buildSingleThreadJSON($id));
-	}
 }
 
 function adminBar() {
